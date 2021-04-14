@@ -1,228 +1,234 @@
 <template>
-  <div>
-    <div v-if="currentFile">
-      <div>
-        <v-progress-linear
+  <v-card
+    max-width="600"
+    class="mx-auto"
+  >
+    <div>
+      <div v-if="currentFile">
+        <div>
+          <v-progress-linear
           v-model="progress"
           color="light-blue"
           height="25"
           reactive
-        >
+          >
           <strong>{{ progress }} %</strong>
-        </v-progress-linear>
-      </div>
-    </div>
-
-    <v-card v-if="loginSection">
-
-    <v-row no-gutters justify="center space-around" align="center">
-      <v-col cols="8">
-        <v-text-field
-          label="Etho Protocol Key"
-          @change="setKey"
-        ></v-text-field>
-      </v-col>
-
-    </v-row>
-
-    <v-row no-gutters justify="center space-around" align="center">
-      <v-col cols="4" class="pl-2" justify="center" align="center">
-        <v-btn color="success" dark small @click="login">
-          Login
-          <v-icon light>mdi-cached</v-icon>
-        </v-btn>
-        <v-btn color="blue" dark small @click="logout">
-          Logout
-          <v-icon light>mdi-cached</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-    </v-card>
-
-    <v-card v-if="userSection">
-
-    <v-row no-gutters justify="center space-around" align="center">
-      <v-col cols="8">
-  
-        <div class="font-weight-normal">
-          <strong>Authentication successful</strong>
+          </v-progress-linear>
         </div>
-      </v-col>
+      </div>
 
-    </v-row>
+      <v-card v-if="loginSection">
 
-    <v-row no-gutters justify="center space-around" align="center">
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-text-field
+              label="Etho Protocol Key"
+              @change="setKey"
+            ></v-text-field>
+          </v-col>
 
-      <v-col cols="4" class="pl-2" justify="center" align="center">
-        <v-btn color="blue" dark small @click="logout">
-          Logout
-          <v-icon light>mdi-cached</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-    </v-card>
+        </v-row>
 
-
-    <v-card v-if="uploadSection && loggedIn">
-    <v-row no-gutters justify="center space-around" align="center">
-      <v-col cols="8">
-        <v-text-field
-          label="Upload Contract Name"
-          @change="setContractName"
-        ></v-text-field>
-      </v-col>
-
-    </v-row>
-
-    <v-row no-gutters justify="center space-around" align="center">
-      <v-col cols="8">
-        <v-select
-          label="Duration (Blocks)"
-          v-model="defaultDuration"
-          :items="durations"
-          @change="setContractDuration"
-        ></v-select>
-      </v-col>
-
-    </v-row>
-
-    <v-row no-gutters justify="center" align="center">
-      <v-col cols="8">
-        <v-file-input
-          show-size
-          label="File input"
-          @change="selectFile"
-        ></v-file-input>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters justify="center" align="center">
-      <v-col cols="4" class="pl-2" justify="center" align="center">
-        <v-btn color="success" dark small @click="upload">
-          Upload
-          <v-icon right dark>mdi-cloud-upload</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-
-    </v-card>
-
-    <v-alert v-if="message" border="left" color="blue-grey" dark>
-      {{ message }}
-    </v-alert>
-
-    <v-card v-if="fileInfos.length > 0" class="mx-auto">
-      <v-dialog
-      v-model="extensionConfirm"
-      persistent
-      max-width="290"
-    >
-      <v-card>
-        <v-card-title class="headline">
-          Confirmation
-        </v-card-title>
-
-        <v-card-text>
-          Continue with contract extension?
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="cancelExtension"
-          >
-            Cancel
-          </v-btn>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="confirmExtension"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog
-      v-model="removalConfirm"
-      persistent
-      max-width="290"
-    >
-      <v-card>
-        <v-card-title class="headline">
-          Confirmation
-        </v-card-title>
-
-        <v-card-text>
-          Continue with contract removal?
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="cancelRemoval"
-          >
-            Cancel
-          </v-btn>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="confirmRemoval"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-      <v-data-table :headers="headers" :items="fileInfos">
-        <v-subheader>Upload Contracts</v-subheader>
-        <template v-slot:item.contractName="{ item }">
-          {{ getContractName(item.data) }}
-        </template>
-        <template v-slot:item.dataLink="{ item }">
-          <v-btn :href="'//ipfs.io/ipfs/' + item.ipfsHash">View Data</v-btn>
-        </template>
-        <template v-slot:item.addressLink="{ item }">
-          <v-btn :href="'//blocks.ether1.org/addr/' + item.address">View Contract</v-btn>
-        </template>
-        <template v-slot:item.contractActions="{ item }">
-          <v-menu
-            bottom
-            offset-y
-          >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              class="ma-2"
-              v-bind="attrs"
-              v-on="on"
-            >
-              Extend Contract
+        <v-row justify="center" align="center">
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="success" dark small @click="login">
+              Login
+              <v-icon light>mdi-cached</v-icon>
             </v-btn>
+            <v-btn color="blue" dark small @click="logout">
+              Logout
+              <v-icon light>mdi-cached</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+
+      <v-card v-if="userSection">
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+  
+            <div class="font-weight-normal">
+              <strong>Authentication successful</strong>
+            </div>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="blue" dark small @click="logout">
+              Logout
+              <v-icon light>mdi-cached</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+
+
+      <v-card v-if="uploadSection && loggedIn">
+        <v-row no-gutters justify="center" align="center">
+          <v-col cols="8">
+            <v-text-field
+              label="Upload Contract Name"
+              @change="setContractName"
+            ></v-text-field>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-select
+              label="Duration (Blocks)"
+              v-model="defaultDuration"
+              :items="durations"
+              @change="setContractDuration"
+            ></v-select>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-file-input
+              show-size
+              label="File input"
+              @change="selectFile"
+            ></v-file-input>
+          </v-col>
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="success" dark small @click="upload">
+              Upload
+              <v-icon right dark>mdi-cloud-upload</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+
+      </v-card>
+
+      <v-alert v-if="message" border="left" color="blue-grey" dark>
+        {{ message }}
+      </v-alert>
+
+      <v-card v-if="fileInfos.length > 0" class="mx-auto">
+        <v-dialog
+          v-model="extensionConfirm"
+          persistent
+          max-width="290"
+        >
+          <v-card>
+            <v-card-title class="headline">
+              Confirmation
+            </v-card-title>
+
+            <v-card-text>
+              Continue with contract extension?
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn
+                color="green darken-1"
+                text
+                @click="cancelExtension"
+              >
+                Cancel
+              </v-btn>
+
+              <v-btn
+                color="green darken-1"
+                text
+                @click="confirmExtension"
+              >
+                Continue
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-dialog
+          v-model="removalConfirm"
+          persistent
+          max-width="290"
+        >
+          <v-card >
+            <v-card-title class="headline">
+              Confirmation
+            </v-card-title>
+
+            <v-card-text>
+              Continue with contract removal?
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn
+                color="green darken-1"
+                text
+                @click="cancelRemoval"
+              >
+                Cancel
+              </v-btn>
+
+              <v-btn
+                color="green darken-1"
+                text
+                @click="confirmRemoval"
+              >
+                Continue
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-data-table :headers="headers" :items="fileInfos">
+          <v-subheader>Upload Contracts</v-subheader>
+          <template v-slot:item.contractName="{ item }">
+            {{ getContractName(item.data) }}
           </template>
-          <v-list>
-            <v-list-item
-            v-for="(duration, i) in durations"
-            :key="i"
-            @click="showConfirmExtension(item.address, duration)"
-          >
-          <v-list-item-title>{{ duration }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-          <v-btn @click="showConfirmRemoval(item.address)">Remove Contract</v-btn>
-        </template>        
-      </v-data-table>
-    </v-card>
-  </div>
+          <template v-slot:item.dataLink="{ item }">
+            <v-btn :href="'//ipfs.io/ipfs/' + item.ipfsHash">View Data</v-btn>
+          </template>
+          <template v-slot:item.addressLink="{ item }">
+            <v-btn :href="'//blocks.ether1.org/addr/' + item.address">View Contract</v-btn>
+          </template>
+          <template v-slot:item.contractActions="{ item }">
+            <v-menu
+              bottom
+              offset-y
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  class="ma-2"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Extend Contract
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item
+                  v-for="(duration, i) in durations"
+                  :key="i"
+                  @click="showConfirmExtension(item.address, duration)"
+                >
+                  <v-list-item-title>{{ duration }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+            <v-btn @click="showConfirmRemoval(item.address)">Remove Contract</v-btn>
+          </template>        
+        </v-data-table>
+      </v-card>
+    </div>
+  </v-card>
 </template>
 
 <script>
