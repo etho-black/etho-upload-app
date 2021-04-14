@@ -1,9 +1,19 @@
 <template>
-  <v-card
-    max-width="600"
-    class="mx-auto"
-  >
-    <div>
+
+    <v-card
+      max-width="600"
+      class="px-4 py-10"
+    >
+       <v-tabs
+        background-color="pink"
+        center-active
+        dark
+        class="pb-3"
+        >
+        <v-tab @click="showLoginSection">Login</v-tab>
+        <v-tab @click="showSignupSection">Signup</v-tab>
+      </v-tabs>
+
       <div v-if="currentFile">
         <div>
           <v-progress-linear
@@ -34,10 +44,40 @@
             <v-btn color="success" dark small @click="login">
               Login
               <v-icon light>mdi-cached</v-icon>
+              
             </v-btn>
-            <v-btn color="blue" dark small @click="logout">
-              Logout
+          </v-col>
+        </v-row>
+      </v-card>
+
+      <v-card v-if="signupSection">
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-text-field
+              label="Account Name"
+              @change="setAccountName"
+            ></v-text-field>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-text-field
+              label="Etho Protocol Key"
+              @change="setKey"
+            ></v-text-field>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="success" dark small @click="signup">
+              Signup
               <v-icon light>mdi-cached</v-icon>
+              
             </v-btn>
           </v-col>
         </v-row>
@@ -46,7 +86,7 @@
       <v-card v-if="userSection">
 
         <v-row justify="center" align="center">
-          <v-col cols="8">
+          <v-col cols="8" justify="center" align="center">
   
             <div class="font-weight-normal">
               <strong>Authentication successful</strong>
@@ -58,6 +98,18 @@
         <v-row justify="center" align="center">
 
           <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="green" dark small @click="showUploadSection">
+              Upload Data
+              <v-icon light>mdi-cached</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="green" dark small @click="showViewDataSection">
+              View Data
+              <v-icon light>mdi-cached</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="blue" dark small @click="logout">
               Logout
               <v-icon light>mdi-cached</v-icon>
@@ -67,7 +119,7 @@
       </v-card>
 
 
-      <v-card v-if="uploadSection && loggedIn">
+      <v-card v-if="uploadSection" class="mt-8">
         <v-row no-gutters justify="center" align="center">
           <v-col cols="8">
             <v-text-field
@@ -115,7 +167,7 @@
         {{ message }}
       </v-alert>
 
-      <v-card v-if="fileInfos.length > 0" class="mx-auto">
+      <v-card v-if="fileInfos.length > 0 && viewDataSection" class="mt-8">
         <v-dialog
           v-model="extensionConfirm"
           persistent
@@ -194,10 +246,10 @@
             {{ getContractName(item.data) }}
           </template>
           <template v-slot:item.dataLink="{ item }">
-            <v-btn :href="'//ipfs.io/ipfs/' + item.ipfsHash">View Data</v-btn>
+            <v-btn :href="'//ipfs.io/ipfs/' + item.ipfsHash" x-small>View</v-btn>
           </template>
           <template v-slot:item.addressLink="{ item }">
-            <v-btn :href="'//blocks.ether1.org/addr/' + item.address">View Contract</v-btn>
+            <v-btn :href="'//blocks.ether1.org/addr/' + item.address" x-small>View</v-btn>
           </template>
           <template v-slot:item.contractActions="{ item }">
             <v-menu
@@ -206,9 +258,10 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                  class="ma-2"
+                  
                   v-bind="attrs"
                   v-on="on"
+                  x-small
                 >
                   Extend Contract
                 </v-btn>
@@ -223,12 +276,12 @@
                 </v-list-item>
               </v-list>
             </v-menu>
-            <v-btn @click="showConfirmRemoval(item.address)">Remove Contract</v-btn>
+            <v-btn x-small @click="showConfirmRemoval(item.address)">Remove Contract</v-btn>
           </template>        
         </v-data-table>
       </v-card>
-    </div>
-  </v-card>
+    </v-card>
+
 </template>
 
 <script>
@@ -242,9 +295,12 @@ export default {
       removalConfirm: false,
       uploadSection: false,
       loginSection: true,
+      viewDataSection: true,
+      signupSection: false,
       userSection: false,
       currentFile: undefined,
       ethoProtcolKey: undefined,
+      accountName: undefined,
       contractName: undefined,
       contractAddress: undefined,
       contractDuration: undefined,
@@ -268,6 +324,64 @@ export default {
     };
   },
   methods: {
+    showViewDataSection() {
+      this.loginSection = false;
+      this.signupSection = false;
+      this.uploadSection = false;
+      this.viewDataSection = true;
+      this.userSection = true;
+      this.contractAddress = undefined;
+      this.accountName = undefined;
+      this.contractName = undefined;
+      this.contractDuration = undefined;
+      this.currentFile = undefined;
+
+      this.message = "";
+    },
+    showUploadSection() {
+      this.loginSection = false;
+      this.signupSection = false;
+      this.uploadSection = true;
+      this.viewDataSection = false;
+      this.userSection = true;
+      this.contractAddress = undefined;
+      this.accountName = undefined;
+      this.contractName = undefined;
+      this.contractDuration = undefined;
+      this.currentFile = undefined;
+
+      this.message = "";
+    },
+    showLoginSection() {
+      this.loginSection = true;
+      this.signupSection = false;
+      this.uploadSection = false;
+      this.userSection = false;
+      this.fileInfos= [];
+      this.contractAddress = undefined;
+      this.ethoProtocolKey = undefined;
+      this.accountName = undefined;
+      this.contractName = undefined;
+      this.contractDuration = undefined;
+      this.currentFile = undefined;
+
+      this.message = "";
+    },
+    showSignupSection() {
+      this.loginSection = false;
+      this.signupSection = true;
+      this.uploadSection = false;
+      this.userSection = false;
+      this.fileInfos= [];
+      this.contractAddress = undefined;
+      this.ethoProtocolKey = undefined;
+      this.accountName = undefined;
+      this.contractName = undefined;
+      this.contractDuration = undefined;
+      this.currentFile = undefined;
+
+      this.message = "";
+    },
     showConfirmExtension(address, duration) {
       this.contractAddress = address;
       this.contractDuration = duration;
@@ -297,6 +411,10 @@ export default {
     setKey(key) {
       this.progress = 0;
       this.ethoProtocolKey = key;
+    },
+    setAccountName(name) {
+      this.progress = 0;
+      this.accountName = name;
     },
     selectFile(file) {
       this.progress = 0;
@@ -335,15 +453,46 @@ export default {
     logout() {
         this.loginSection = true;
         this.userSection = false;
-        this.fileInfos = undefined;
+        this.fileInfos = [];
         this.contractAddress = undefined;
         this.ethoProtocolKey = undefined;
+        this.accountName = undefined;
         this.contractName = undefined;
         this.contractDuration = undefined;
         this.currentFile = undefined;
 
         this.message = "";
 
+    },
+    signup() {
+      if (!this.ethoProtocolKey) {
+        this.message = "Please enter Etho Protocol key!";
+        return;
+      }
+      if (!this.accountName) {
+        this.message = "Please enter account name";
+        return;
+      }
+
+      this.message = "";
+      
+      UploadService.authenticate(this.ethoProtocolKey).then(response => {
+        console.log(response);
+        if(response.data.message === "true") {
+          this.message = "User already registered, please login";
+          return
+        } else {
+          UploadService.signup(this.ethoProtocolKey, this.accountName).then(response => {
+            console.log(response);
+            UploadService.list(this.ethoProtocolKey).then(response => {
+              this.loginSection = false;
+              this.userSection = true;
+              this.fileInfos = response.data;
+            })
+          })
+        }
+        
+      })
     },
     login() {
       if (!this.ethoProtocolKey) {
@@ -353,13 +502,14 @@ export default {
 
       this.message = "";
 
-      UploadService.list(this.ethoProtocolKey).then(response => {
+      UploadService.authenticate(this.ethoProtocolKey).then(response => {
+        console.log(response);
         this.loginSection = false;
         this.userSection = true;
-        this.fileInfos = response.data;
+        UploadService.list(this.ethoProtocolKey).then(response => {
+          this.fileInfos = response.data;
+        })
       })
-
-
     },
     upload() {
       if (!this.currentFile) {
@@ -398,6 +548,7 @@ export default {
           this.contractName = undefined;
           this.contractAddress = undefined;
           this.contractDuration = undefined;
+          this.accountName = undefined;
         });
     },
     extend() {
@@ -429,6 +580,7 @@ export default {
             this.contractName = undefined;
             this.contractAddress = undefined;
             this.contractDuration = undefined;
+            this.accountName = undefined;
           });
         })
         .catch(() => {
@@ -439,6 +591,7 @@ export default {
           this.contractName = undefined;
           this.contractAddress = undefined;
           this.contractDuration = undefined;
+          this.accountName = undefined;
         });
     },
     remove() {
@@ -465,6 +618,7 @@ export default {
             this.contractName = undefined;
             this.contractAddress = undefined;
             this.contractDuration = undefined;
+            this.accountName = undefined;
           });
         })
         .catch(() => {
@@ -475,6 +629,7 @@ export default {
           this.contractName = undefined;
           this.contractAddress = undefined;
           this.contractDuration = undefined;
+          this.accountName = undefined;
         });
     },
   },

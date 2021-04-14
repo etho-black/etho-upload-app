@@ -46,12 +46,38 @@ class UploadFilesService {
     });
   }
 
+  signup(key, name, onUploadProgress) {
+    let formData = new FormData();
+
+    formData.append("key", key);
+    formData.append("name", name);
+
+    return http.post("/signup", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      onUploadProgress
+    });
+  }
+
   list(key) {
     let formData = new FormData();
 
     formData.append("key", key);
 
      return http.post("/list", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+    });
+  }
+
+  authenticate(key) {
+    let formData = new FormData();
+
+    formData.append("key", key);
+
+     return http.post("/authenticate", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },
