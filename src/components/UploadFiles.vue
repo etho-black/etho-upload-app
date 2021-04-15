@@ -97,7 +97,7 @@
             </v-btn>
           </v-col>
           <v-col cols="4" class="pl-2" justify="center" align="center">
-            <v-btn color="blue" dark small @click="logout">
+            <v-btn color="blue" dark small @click:clear="logout">
               Logout
               <v-icon light>mdi-cached</v-icon>
             </v-btn>
@@ -303,7 +303,7 @@ export default {
       accountName: undefined,
       contractName: undefined,
       contractAddress: undefined,
-      contractDuration: undefined,
+      contractDuration: 100000,
       progress: 0,
       showProgress: false,
       message: "",
@@ -334,7 +334,7 @@ export default {
       this.contractAddress = undefined;
       this.accountName = undefined;
       this.contractName = undefined;
-      this.contractDuration = undefined;
+      this.contractDuration = 100000;
       this.currentFile = undefined;
 
       this.message = "";
@@ -348,7 +348,7 @@ export default {
       this.contractAddress = undefined;
       this.accountName = undefined;
       this.contractName = undefined;
-      this.contractDuration = undefined;
+      this.contractDuration = 100000;
       this.currentFile = undefined;
 
       this.message = "";
@@ -363,7 +363,7 @@ export default {
       this.ethoProtocolKey = undefined;
       this.accountName = undefined;
       this.contractName = undefined;
-      this.contractDuration = undefined;
+      this.contractDuration = 100000;
       this.currentFile = undefined;
 
       this.message = "";
@@ -378,7 +378,7 @@ export default {
       this.ethoProtocolKey = undefined;
       this.accountName = undefined;
       this.contractName = undefined;
-      this.contractDuration = undefined;
+      this.contractDuration = 100000;
       this.currentFile = undefined;
 
       this.message = "";
@@ -395,7 +395,7 @@ export default {
     cancelExtension() {
       this.extensionConfirm = false;
       this.contractAddress = undefined;
-      this.contractDuration = undefined;
+      this.contractDuration = 100000;
     },
     showConfirmRemoval(address) {
       this.contractAddress = address;
@@ -462,7 +462,7 @@ export default {
         this.ethoProtocolKey = undefined;
         this.accountName = undefined;
         this.contractName = undefined;
-        this.contractDuration = undefined;
+        this.contractDuration = 100000;
         this.currentFile = undefined;
 
         this.message = "";
@@ -489,14 +489,18 @@ export default {
         } else {
           UploadService.signup(this.ethoProtocolKey, this.accountName).then(response => {
             console.log(response);
-            UploadService.list(this.ethoProtocolKey).then(response => {
-              this.loginSection = false;
-              this.userSection = true;
-              this.fileInfos = response.data;
-            })
+            if(response.data.message === "false") {
+              this.message = "User registration failed, please check wallet balance";
+              return
+            } else {
+              UploadService.list(this.ethoProtocolKey).then(response => {
+                this.loginSection = false;
+                this.userSection = true;
+                this.fileInfos = response.data;
+              })
+            }
           })
-        }
-        
+        }  
       })
     },
     login() {
@@ -510,11 +514,16 @@ export default {
 
       UploadService.authenticate(this.ethoProtocolKey).then(response => {
         console.log(response);
-        this.loginSection = false;
-        this.userSection = true;
-        UploadService.list(this.ethoProtocolKey).then(response => {
-          this.fileInfos = response.data;
-        })
+        if(response.data.message === "true") {
+          this.loginSection = false;
+          this.userSection = true;
+          UploadService.list(this.ethoProtocolKey).then(response => {
+            this.fileInfos = response.data;
+          })
+        } else {
+          this.message = "Authentication failed - user not found";
+        }
+
       })
     },
     upload() {
@@ -557,7 +566,7 @@ export default {
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
           this.contractAddress = undefined;
-          this.contractDuration = undefined;
+          this.contractDuration = 100000;
           this.accountName = undefined;
         });
     },
@@ -604,7 +613,7 @@ export default {
             this.currentFile = undefined;
             this.contractName = undefined;
             this.contractAddress = undefined;
-            this.contractDuration = undefined;
+            this.contractDuration = 100000;
             this.accountName = undefined;
             this.showProgress = false;
           });
@@ -617,7 +626,7 @@ export default {
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
           this.contractAddress = undefined;
-          this.contractDuration = undefined;
+          this.contractDuration = 100000;
           this.accountName = undefined;
         });
     },
@@ -660,7 +669,7 @@ export default {
             this.currentFile = undefined;
             this.contractName = undefined;
             this.contractAddress = undefined;
-            this.contractDuration = undefined;
+            this.contractDuration = 100000;
             this.accountName = undefined;
             this.showProgress = false;
           });
@@ -673,7 +682,7 @@ export default {
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
           this.contractAddress = undefined;
-          this.contractDuration = undefined;
+          this.contractDuration = 100000;
           this.accountName = undefined;
         });
     },
