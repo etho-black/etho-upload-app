@@ -31,11 +31,11 @@
           </div>
         </div>
         <div class="col-1 d-none d-md-block" />
-        <div class="col-12 col-md-5 d-none d-md-block">
+        <div class="col-12 col-md-5 d-md-block">
           <div class="home-contain p-2">
             <div>
               <!-- Tile js start -->
-              <div class="d-flex justify-content-center">
+              <div class="d-none d-md-block justify-content-center ">
                 <img :src='"./assets/images/etho/logo-only.svg"' style="width: 50%; object-fit: contain;" />
               </div>
               <!-- Tile js end -->

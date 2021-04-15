@@ -6,8 +6,8 @@
     <b-collapse class="default-nav" is-nav id="nav_collapse">
       <b-navbar-nav class="navbar-nav ml-auto" id="mymenu">
         <b-nav-item href="#home">Home</b-nav-item>
-        <b-nav-item style="cursor: pointer;" @click="openNodes">Nodes</b-nav-item>
         <b-nav-item style="cursor: pointer;" @click="openUploads">Uploads</b-nav-item>
+        <b-nav-item style="cursor: pointer;" @click="openNodes">Nodes</b-nav-item>
         <b-nav-item style="cursor: pointer;" @click="openStaking">Staking</b-nav-item>
 
         <b-nav-item-dropdown right-alignment text="wallets" class="nav-link">
@@ -19,14 +19,6 @@
         <b-nav-item-dropdown right-alignment text="explorers" class="nav-link">
           <b-dropdown-item class="nav-link" style="cursor: pointer;" @click="openExplorer1">Explorer 1</b-dropdown-item>
           <b-dropdown-item class="nav-link" style="cursor: pointer;" @click="openExplorer2">Explorer 2</b-dropdown-item>
-        </b-nav-item-dropdown>
-
-        <b-nav-item href="#team">Team</b-nav-item>
-
-        <b-nav-item-dropdown right-alignment text="get etho" class="nav-link">
-          <b-dropdown-item class="nav-link" :href='"#exchanges"'>Exchanges</b-dropdown-item>
-          <b-dropdown-item class="nav-link" :to="'#swaps'">Swaps</b-dropdown-item>
-          <b-dropdown-item class="nav-link" :to="'#bridges'">Bridges</b-dropdown-item>
         </b-nav-item-dropdown>
 
       </b-navbar-nav>
@@ -42,7 +34,7 @@ export default {
       window.open('https://staking.ethofs.com');
     },
     openUploads() {
-      window.open('https://ethofs.com');
+      window.open('https://uploads.ethoprotocol.com');
     },
     openNodes() {
       window.open('https://nodes.ether1.org');
