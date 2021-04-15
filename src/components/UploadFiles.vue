@@ -14,19 +14,6 @@
         <v-tab @click="showSignupSection">Signup</v-tab>
       </v-tabs>
 
-      <div v-if="currentFile">
-        <div>
-          <v-progress-linear
-          v-model="progress"
-          color="light-blue"
-          height="25"
-          reactive
-          >
-          <strong>{{ progress }} %</strong>
-          </v-progress-linear>
-        </div>
-      </div>
-
       <v-card v-if="loginSection">
 
         <v-row justify="center" align="center">
@@ -118,7 +105,6 @@
         </v-row>
       </v-card>
 
-
       <v-card v-if="uploadSection" class="mt-8">
         <v-row no-gutters justify="center" align="center">
           <v-col cols="8">
@@ -163,7 +149,22 @@
 
       </v-card>
 
-      <v-alert v-if="message" border="left" color="blue-grey" dark>
+      <v-card v-if="showProgress" class="mt-4">
+      <div>
+        <div>
+          <v-progress-linear
+          v-model="progress"
+          color="light-blue"
+          height="25"
+          reactive
+          >
+          <strong>{{ progress }} %</strong>
+          </v-progress-linear>
+        </div>
+      </div>
+      </v-card>
+
+      <v-alert v-if="message" border="left" color="blue-grey" dark class="mt-4">
         {{ message }}
       </v-alert>
 
@@ -281,7 +282,6 @@
         </v-data-table>
       </v-card>
     </v-card>
-
 </template>
 
 <script>
@@ -305,6 +305,7 @@ export default {
       contractAddress: undefined,
       contractDuration: undefined,
       progress: 0,
+      showProgress: false,
       message: "",
       fileInfos: [],
       defaultDuration: 100000,
@@ -443,6 +444,9 @@ export default {
         return "Unknown Name";
       }  
     }, 
+    updateProgressBar(percent) {
+      this.progress = Math.round((100 * percent) / 100);
+    },
     checkJson(data) {
       try {
         return (JSON.parse(data) && !!data);
@@ -465,6 +469,7 @@ export default {
 
     },
     signup() {
+      this.progress = 0;
       if (!this.ethoProtocolKey) {
         this.message = "Please enter Etho Protocol key!";
         return;
@@ -495,6 +500,7 @@ export default {
       })
     },
     login() {
+      this.progress = 0;
       if (!this.ethoProtocolKey) {
         this.message = "Please enter Etho Protocol key!";
         return;
@@ -512,6 +518,7 @@ export default {
       })
     },
     upload() {
+      this.progress = 0;
       if (!this.currentFile) {
         this.message = "Please select a file!";
         return;
@@ -529,6 +536,7 @@ export default {
         return;
       }
 
+      this.showProgress = true;
       this.message = "";
 
       UploadService.upload(this.currentFile, this.ethoProtocolKey, this.contractName, this.contractDuration, (event) => {
@@ -538,9 +546,11 @@ export default {
           this.message = response.data.message;
           UploadService.list(this.ethoProtocolKey).then(response => {
             this.fileInfos = response.data;
+            this.showProgress = false;
           });
         })
         .catch(() => {
+          this.showProgress = false;
           this.progress = 0;
           this.message = "Could not upload the file!";
           this.currentFile = undefined;
@@ -552,7 +562,7 @@ export default {
         });
     },
     extend() {
-
+      this.progress = 0;
       if (!this.ethoProtocolKey) {
         this.message = "Please enter Etho Protocol key!";
         return;
@@ -566,14 +576,29 @@ export default {
         return;
       }
 
+      this.showProgress = true;
       this.message = "";
+      var loaded = 0;
+      var self = this;
+      var period = Math.random() * (1500 - 300) + 300;
+      var progressInterval = setInterval(function(){
+        if(loaded < 99) {
+          loaded += Math.floor(Math.random() * 4);
+          if(loaded < 99) {
+            self.updateProgressBar(loaded);
+          }
+        } else {
+          clearInterval(progressInterval);
+        }
+      }, period);
 
-      UploadService.extend(this.ethoProtocolKey, this.contractAddress, this.contractDuration, (event) => {
-        this.progress = Math.round((100 * event.loaded) / event.total);
-      })
-        .then((response) => {
-          this.message = response.data.message;
+      UploadService.extend(this.ethoProtocolKey, this.contractAddress, this.contractDuration).then((response) => {
+          console.log(response);
+          //this.message = response.data.message;
           UploadService.list(this.ethoProtocolKey).then(response => {
+            loaded = 100;
+            clearInterval(progressInterval);
+            this.updateProgressBar(loaded);
             this.fileInfos = response.data;
             this.message = "Contract extension successful!";
             this.currentFile = undefined;
@@ -581,9 +606,11 @@ export default {
             this.contractAddress = undefined;
             this.contractDuration = undefined;
             this.accountName = undefined;
+            this.showProgress = false;
           });
         })
         .catch(() => {
+          this.showProgress = false;
           this.progress = 0;
           this.message = "Contract extension failed!";
           this.currentFile = undefined;
@@ -595,6 +622,7 @@ export default {
         });
     },
     remove() {
+      this.progress = 0;
       if (!this.ethoProtocolKey) {
         this.message = "Please enter Etho Protocol key!";
         return;
@@ -604,14 +632,29 @@ export default {
         return;
       }
 
+      this.showProgress = true;
       this.message = "";
+      var loaded = 0;
+      var self = this;
+      var period = Math.random() * (1500 - 300) + 300;
+      var progressInterval = setInterval(function(){
+        if(loaded < 99) {
+          loaded += Math.floor(Math.random() * 4);
+          if(loaded < 99) {
+            self.updateProgressBar(loaded);
+          }
+        } else {
+          clearInterval(progressInterval);
+        }
+      }, period);
 
-      UploadService.remove(this.ethoProtocolKey, this.contractAddress, (event) => {
-        this.progress = Math.round((100 * event.loaded) / event.total);
-      })
-        .then((response) => {
-          this.message = response.data.message;
+      UploadService.remove(this.ethoProtocolKey, this.contractAddress).then((response) => {
+          console.log(response);
+          //this.message = response.data.message;
           UploadService.list(this.ethoProtocolKey).then(response => {
+            loaded = 100;
+            clearInterval(progressInterval);
+            this.updateProgressBar(loaded);
             this.fileInfos = response.data;
             this.message = "Contract removal successful!";
             this.currentFile = undefined;
@@ -619,9 +662,11 @@ export default {
             this.contractAddress = undefined;
             this.contractDuration = undefined;
             this.accountName = undefined;
+            this.showProgress = false;
           });
         })
         .catch(() => {
+          this.showProgress = false;
           this.progress = 0;
           this.message = "Contract removal failed!";
           this.currentFile = undefined;
