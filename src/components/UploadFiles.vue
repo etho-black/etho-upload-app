@@ -97,7 +97,7 @@
             </v-btn>
           </v-col>
           <v-col cols="4" class="pl-2" justify="center" align="center">
-            <v-btn color="blue" dark small @click:clear="logout">
+            <v-btn color="blue" dark small @click="logout">
               Logout
               <v-icon light>mdi-cached</v-icon>
             </v-btn>
@@ -299,7 +299,7 @@ export default {
       signupSection: false,
       userSection: false,
       currentFile: undefined,
-      ethoProtcolKey: undefined,
+      ethoProtocolKey: undefined,
       accountName: undefined,
       contractName: undefined,
       contractAddress: undefined,
@@ -471,7 +471,7 @@ export default {
     signup() {
       this.progress = 0;
       if (!this.ethoProtocolKey) {
-        this.message = "Please enter Etho Protocol key!";
+        this.message = "Please enter Etho Protocol key";
         return;
       }
       if (!this.accountName) {
@@ -480,6 +480,11 @@ export default {
       }
 
       this.message = "";
+
+      var loaded = 0;
+      var self = this;
+      var period = Math.random() * (1500 - 300) + 300;
+      var progressInterval;
       
       UploadService.authenticate(this.ethoProtocolKey).then(response => {
         console.log(response);
@@ -487,16 +492,38 @@ export default {
           this.message = "User already registered, please login";
           return
         } else {
+          this.showProgress = true;
+          progressInterval = setInterval(function(){
+            if(loaded < 99) {
+              loaded += Math.floor(Math.random() * 4);
+              if(loaded < 99) {
+                self.updateProgressBar(loaded);
+              }
+            } else {
+              clearInterval(progressInterval);
+            }
+          }, period);
+
           UploadService.signup(this.ethoProtocolKey, this.accountName).then(response => {
             console.log(response);
             if(response.data.message === "false") {
               this.message = "User registration failed, please check wallet balance";
               return
             } else {
+              this.message = "Retrieving existing contracts";
               UploadService.list(this.ethoProtocolKey).then(response => {
+
+                loaded = 100;
+                clearInterval(progressInterval);
+                this.updateProgressBar(loaded);
+                this.fileInfos = response.data;
+                this.message = "User registration successful";
                 this.loginSection = false;
                 this.userSection = true;
-                this.fileInfos = response.data;
+                setTimeout(function(){ 
+                  self.message = "";
+                }, 3000);
+                
               })
             }
           })
@@ -506,7 +533,7 @@ export default {
     login() {
       this.progress = 0;
       if (!this.ethoProtocolKey) {
-        this.message = "Please enter Etho Protocol key!";
+        this.message = "Please enter Etho Protocol key";
         return;
       }
 
@@ -517,7 +544,9 @@ export default {
         if(response.data.message === "true") {
           this.loginSection = false;
           this.userSection = true;
+          this.message = "Retrieving existing contracts";
           UploadService.list(this.ethoProtocolKey).then(response => {
+            this.message = "";
             this.fileInfos = response.data;
           })
         } else {
@@ -529,55 +558,87 @@ export default {
     upload() {
       this.progress = 0;
       if (!this.currentFile) {
-        this.message = "Please select a file!";
+        this.message = "Please select a file";
         return;
       }
       if (!this.ethoProtocolKey) {
-        this.message = "Please enter Etho Protocol key!";
+        this.message = "Please enter Etho Protocol key";
         return;
       }
       if (!this.contractName) {
-        this.message = "Please enter upload contract name!";
+        this.message = "Please enter upload contract name";
         return;
       }
       if (!this.contractDuration) {
-        this.message = "Please select upload contract duration!";
+        this.message = "Please select upload contract duration";
         return;
       }
 
       this.showProgress = true;
       this.message = "";
-
+      
+      var self = this;
+      var progressInterval; 
+      var loaded = 0;
+      
       UploadService.upload(this.currentFile, this.ethoProtocolKey, this.contractName, this.contractDuration, (event) => {
         this.progress = Math.round((100 * event.loaded) / event.total);
-      })
-        .then((response) => {
-          this.message = response.data.message;
-          UploadService.list(this.ethoProtocolKey).then(response => {
-            this.fileInfos = response.data;
-            this.showProgress = false;
-          });
-        })
-        .catch(() => {
+        if(this.progress == 100) {
           this.showProgress = false;
           this.progress = 0;
-          this.message = "Could not upload the file!";
-          this.currentFile = undefined;
-          this.ethoProtocolKey = undefined;
-          this.contractName = undefined;
-          this.contractAddress = undefined;
-          this.contractDuration = 100000;
-          this.accountName = undefined;
+          this.message = "Waiting for transaction confirmation";
+          var period = Math.random() * (1500 - 300) + 300;
+          
+          progressInterval = setInterval(function(){
+            self.showProgress = true;
+            if(loaded < 99) {
+              loaded += Math.floor(Math.random() * 4);
+              if(loaded < 99) {
+                self.updateProgressBar(loaded);
+              }
+            } else {
+              clearInterval(progressInterval);
+            }
+          }, period);
+
+        } else {
+          this.message = "Data upload in progress";
+        }
+      })
+      .then((response) => {
+        console.log(response);
+        //this.message = response.data.message;
+        loaded = 100;
+        clearInterval(progressInterval);
+        this.updateProgressBar(loaded);
+        this.message = "Retrieving existing contracts";
+        UploadService.list(this.ethoProtocolKey).then(response => {
+          this.message = "";
+          this.fileInfos = response.data;
+          this.showProgress = false;
+          this.showViewDataSection()
         });
+      })
+      .catch(() => {
+        this.showProgress = false;
+        this.progress = 0;
+        this.message = "Could not upload the file";
+        this.currentFile = undefined;
+        this.ethoProtocolKey = undefined;
+        this.contractName = undefined;
+        this.contractAddress = undefined;
+        this.contractDuration = 100000;
+        this.accountName = undefined;
+      });
     },
     extend() {
       this.progress = 0;
       if (!this.ethoProtocolKey) {
-        this.message = "Please enter Etho Protocol key!";
+        this.message = "Please enter Etho Protocol key";
         return;
       }
       if (!this.contractAddress) {
-        this.message = "Please select a valid contract!";
+        this.message = "Please select a valid contract";
         return;
       }
       if (!this.contractDuration) {
@@ -601,15 +662,22 @@ export default {
         }
       }, period);
 
+      this.message = "Confirming contract extension";
       UploadService.extend(this.ethoProtocolKey, this.contractAddress, this.contractDuration).then((response) => {
           console.log(response);
           //this.message = response.data.message;
+          this.message = "Retrieving existing contracts";
           UploadService.list(this.ethoProtocolKey).then(response => {
+
             loaded = 100;
             clearInterval(progressInterval);
             this.updateProgressBar(loaded);
             this.fileInfos = response.data;
-            this.message = "Contract extension successful!";
+            this.message = "Contract extension successful";
+            setTimeout(function(){ 
+              self.message = "";
+            }, 3000);
+            
             this.currentFile = undefined;
             this.contractName = undefined;
             this.contractAddress = undefined;
@@ -621,7 +689,7 @@ export default {
         .catch(() => {
           this.showProgress = false;
           this.progress = 0;
-          this.message = "Contract extension failed!";
+          this.message = "Contract extension failed";
           this.currentFile = undefined;
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
@@ -657,15 +725,20 @@ export default {
         }
       }, period);
 
+      this.message = "Confirming contract removal";
       UploadService.remove(this.ethoProtocolKey, this.contractAddress).then((response) => {
           console.log(response);
           //this.message = response.data.message;
+          this.message = "Retrieving existing contracts";
           UploadService.list(this.ethoProtocolKey).then(response => {
             loaded = 100;
             clearInterval(progressInterval);
             this.updateProgressBar(loaded);
             this.fileInfos = response.data;
-            this.message = "Contract removal successful!";
+            this.message = "Contract removal successful";
+            setTimeout(function(){ 
+              self.message = "";
+            }, 3000);
             this.currentFile = undefined;
             this.contractName = undefined;
             this.contractAddress = undefined;
@@ -677,7 +750,7 @@ export default {
         .catch(() => {
           this.showProgress = false;
           this.progress = 0;
-          this.message = "Contract removal failed!";
+          this.message = "Contract removal failed";
           this.currentFile = undefined;
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
