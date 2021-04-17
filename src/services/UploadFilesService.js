@@ -3,7 +3,7 @@ import http from "../http-common";
 class UploadFilesService {
   upload(file, key, name, duration, onUploadProgress) {
     let formData = new FormData();
-
+    console.log(file);
     formData.append("file", file);
     formData.append("key", key);
     formData.append("name", name);
@@ -15,6 +15,41 @@ class UploadFilesService {
       },
       onUploadProgress
     });
+  }
+
+  async uploadDirectory(directory, key, name, duration, onUploadProgress) {
+    let formData = new FormData();
+    //console.log(directory);
+    directory.forEach(function(file, index, array){
+      formData.append("files", file);
+      //console.log(file);
+      if(index === (array.length-1)) {
+        formData.append("key", key);
+        formData.append("name", name);
+        formData.append("duration", duration);
+        console.log("finished");
+        console.log(formData);
+        return http.post("/uploaddirectory", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
+          onUploadProgress
+        });
+      }
+    })
+
+    /*formData.append("files", directory[0]);
+    formData.append("key", key);
+    formData.append("name", name);
+    formData.append("duration", duration);
+
+    return http.post("/uploaddirectory", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      onUploadProgress
+    });*/
+
   }
 
   extend(key, address, duration, onUploadProgress) {

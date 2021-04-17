@@ -86,7 +86,13 @@
 
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="green" dark small @click="showUploadSection">
-              Upload Data
+              Upload File
+              <v-icon light>mdi-cached</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="green" dark small @click="showUploadDirectorySection">
+              Upload Directory
               <v-icon light>mdi-cached</v-icon>
             </v-btn>
           </v-col>
@@ -141,6 +147,52 @@
         <v-row justify="center" align="center">
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="success" dark small @click="upload">
+              Upload
+              <v-icon right dark>mdi-cloud-upload</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+
+      </v-card>
+
+      <v-card v-if="uploadDirectorySection" class="mt-8">
+        <v-row no-gutters justify="center" align="center">
+          <v-col cols="8">
+            <v-text-field
+              label="Upload Contract Name"
+              @change="setContractName"
+            ></v-text-field>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-select
+              label="Duration (Blocks)"
+              v-model="defaultDuration"
+              :items="durations"
+              @change="setContractDuration"
+            ></v-select>
+          </v-col>
+
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="8">
+            <v-file-input
+              show-size
+              multiple
+              webkitdirectory
+              label="Directory input"
+              @change="selectDirectory"
+            ></v-file-input>
+          </v-col>
+        </v-row>
+
+        <v-row justify="center" align="center">
+          <v-col cols="4" class="pl-2" justify="center" align="center">
+            <v-btn color="success" dark small @click="uploadDirectory">
               Upload
               <v-icon right dark>mdi-cloud-upload</v-icon>
             </v-btn>
@@ -294,11 +346,13 @@ export default {
       extensionConfirm: false,
       removalConfirm: false,
       uploadSection: false,
+      uploadDirectorySection: false,
       loginSection: true,
       viewDataSection: true,
       signupSection: false,
       userSection: false,
       currentFile: undefined,
+      currentDirectory: undefined,
       ethoProtocolKey: undefined,
       accountName: undefined,
       contractName: undefined,
@@ -336,6 +390,7 @@ export default {
       this.contractName = undefined;
       this.contractDuration = 100000;
       this.currentFile = undefined;
+      this.currentDirectory = undefined;
 
       this.message = "";
     },
@@ -343,6 +398,7 @@ export default {
       this.loginSection = false;
       this.signupSection = false;
       this.uploadSection = true;
+      this.uploadDirectorySection = false;
       this.viewDataSection = false;
       this.userSection = true;
       this.contractAddress = undefined;
@@ -350,6 +406,23 @@ export default {
       this.contractName = undefined;
       this.contractDuration = 100000;
       this.currentFile = undefined;
+      this.currentDirectory = undefined;
+
+      this.message = "";
+    },
+    showUploadDirectorySection() {
+      this.loginSection = false;
+      this.signupSection = false;
+      this.uploadDirectorySection = true;
+      this.uploadSection = false;
+      this.viewDataSection = false;
+      this.userSection = true;
+      this.contractAddress = undefined;
+      this.accountName = undefined;
+      this.contractName = undefined;
+      this.contractDuration = 100000;
+      this.currentFile = undefined;
+      this.currentDirectory = undefined;
 
       this.message = "";
     },
@@ -365,6 +438,7 @@ export default {
       this.contractName = undefined;
       this.contractDuration = 100000;
       this.currentFile = undefined;
+      this.currentDirectory = undefined;
 
       this.message = "";
     },
@@ -380,6 +454,7 @@ export default {
       this.contractName = undefined;
       this.contractDuration = 100000;
       this.currentFile = undefined;
+      this.currentDirectory = undefined;
 
       this.message = "";
     },
@@ -420,6 +495,11 @@ export default {
     selectFile(file) {
       this.progress = 0;
       this.currentFile = file;
+    },
+    selectDirectory(directory) {
+      console.log(directory);
+      this.progress = 0;
+      this.currentDirectory = directory;
     },
     setContractName(name) {
       this.progress = 0;
@@ -464,6 +544,7 @@ export default {
         this.contractName = undefined;
         this.contractDuration = 100000;
         this.currentFile = undefined;
+        this.currentDirectory = undefined;
 
         this.message = "";
 
@@ -624,6 +705,84 @@ export default {
         this.progress = 0;
         this.message = "Could not upload the file";
         this.currentFile = undefined;
+        this.currentDirectory = undefined;
+        this.ethoProtocolKey = undefined;
+        this.contractName = undefined;
+        this.contractAddress = undefined;
+        this.contractDuration = 100000;
+        this.accountName = undefined;
+      });
+    },
+    uploadDirectory() {
+      this.progress = 0;
+      if (!this.currentDirectory) {
+        this.message = "Please select a directory";
+        return;
+      }
+      if (!this.ethoProtocolKey) {
+        this.message = "Please enter Etho Protocol key";
+        return;
+      }
+      if (!this.contractName) {
+        this.message = "Please enter upload contract name";
+        return;
+      }
+      if (!this.contractDuration) {
+        this.message = "Please select upload contract duration";
+        return;
+      }
+
+      this.showProgress = true;
+      this.message = "";
+      
+      var self = this;
+      var progressInterval; 
+      var loaded = 0;
+      
+      UploadService.uploadDirectory(this.currentDirectory, this.ethoProtocolKey, this.contractName, this.contractDuration, (event) => {
+        this.progress = Math.round((100 * event.loaded) / event.total);
+        if(this.progress == 100) {
+          this.showProgress = false;
+          this.progress = 0;
+          this.message = "Waiting for transaction confirmation";
+          var period = Math.random() * (1500 - 300) + 300;
+          
+          progressInterval = setInterval(function(){
+            self.showProgress = true;
+            if(loaded < 99) {
+              loaded += Math.floor(Math.random() * 4);
+              if(loaded < 99) {
+                self.updateProgressBar(loaded);
+              }
+            } else {
+              clearInterval(progressInterval);
+            }
+          }, period);
+
+        } else {
+          this.message = "Data upload in progress";
+        }
+      })
+      .then((response) => {
+        console.log(response);
+        //this.message = response.data.message;
+        loaded = 100;
+        clearInterval(progressInterval);
+        this.updateProgressBar(loaded);
+        this.message = "Retrieving existing contracts";
+        UploadService.list(this.ethoProtocolKey).then(response => {
+          this.message = "";
+          this.fileInfos = response.data;
+          this.showProgress = false;
+          this.showViewDataSection()
+        });
+      })
+      .catch(() => {
+        this.showProgress = false;
+        this.progress = 0;
+        this.message = "Could not upload the file";
+        this.currentFile = undefined;
+        this.currentDirectory = undefined;
         this.ethoProtocolKey = undefined;
         this.contractName = undefined;
         this.contractAddress = undefined;
@@ -679,6 +838,7 @@ export default {
             }, 3000);
             
             this.currentFile = undefined;
+            this.currentDirectory = undefined;
             this.contractName = undefined;
             this.contractAddress = undefined;
             this.contractDuration = 100000;
@@ -691,6 +851,7 @@ export default {
           this.progress = 0;
           this.message = "Contract extension failed";
           this.currentFile = undefined;
+          this.currentDirectory = undefined;
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
           this.contractAddress = undefined;
@@ -740,6 +901,7 @@ export default {
               self.message = "";
             }, 3000);
             this.currentFile = undefined;
+            this.currentDirectory = undefined;
             this.contractName = undefined;
             this.contractAddress = undefined;
             this.contractDuration = 100000;
@@ -752,6 +914,7 @@ export default {
           this.progress = 0;
           this.message = "Contract removal failed";
           this.currentFile = undefined;
+          this.currentDirectory = undefined;
           this.ethoProtocolKey = undefined;
           this.contractName = undefined;
           this.contractAddress = undefined;
