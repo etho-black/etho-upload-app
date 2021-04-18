@@ -65,9 +65,10 @@
       v-model="uploadApplication"
       persistent
       max-width="600"
+      
     >
       
-      <v-card>
+      <v-card max-height="80vh"> 
         <v-card-title class="headline">
           Etho Protocol Upload
         </v-card-title>

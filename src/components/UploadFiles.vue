@@ -4,7 +4,7 @@
       max-width="600"
       class="px-4 py-10"
     >
-       <v-tabs
+      <v-tabs
         background-color="pink"
         center-active
         dark
@@ -30,7 +30,7 @@
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="success" dark small @click="login">
               Login
-              <v-icon light>mdi-cached</v-icon>
+              <v-icon light>mdi-login</v-icon>
               
             </v-btn>
           </v-col>
@@ -63,7 +63,7 @@
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="success" dark small @click="signup">
               Signup
-              <v-icon light>mdi-cached</v-icon>
+              <v-icon light>mdi-account-plus</v-icon>
               
             </v-btn>
           </v-col>
@@ -87,25 +87,25 @@
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="green" dark small @click="showUploadSection">
               Upload File
-              <v-icon light>mdi-cached</v-icon>
+              <v-icon light>mdi-upload</v-icon>
             </v-btn>
           </v-col>
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="green" dark small @click="showUploadDirectorySection">
               Upload Directory
-              <v-icon light>mdi-cached</v-icon>
+              <v-icon light>mdi-upload</v-icon>
             </v-btn>
           </v-col>
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="green" dark small @click="showViewDataSection">
               View Data
-              <v-icon light>mdi-cached</v-icon>
+              <v-icon light>mdi-folder</v-icon>
             </v-btn>
           </v-col>
           <v-col cols="4" class="pl-2" justify="center" align="center">
-            <v-btn color="blue" dark small @click="logout">
+            <v-btn color="black" dark small @click="logout">
               Logout
-              <v-icon light>mdi-cached</v-icon>
+              <v-icon light>mdi-logout</v-icon>
             </v-btn>
           </v-col>
         </v-row>
@@ -200,31 +200,11 @@
         </v-row>
 
       </v-card>
-
-      <v-card v-if="showProgress" class="mt-4">
-      <div>
-        <div>
-          <v-progress-linear
-          v-model="progress"
-          color="light-blue"
-          height="25"
-          reactive
-          >
-          <strong>{{ progress }} %</strong>
-          </v-progress-linear>
-        </div>
-      </div>
-      </v-card>
-
-      <v-alert v-if="message" border="left" color="blue-grey" dark class="mt-4">
-        {{ message }}
-      </v-alert>
-
-      <v-card v-if="fileInfos.length > 0 && viewDataSection" class="mt-8">
+      <v-card v-if="fileInfos.length > 0 && viewDataSection && !showProgress && !message" class="mt-8">
         <v-dialog
           v-model="extensionConfirm"
           persistent
-          max-width="290"
+          max-width="290" 
         >
           <v-card>
             <v-card-title class="headline">
@@ -293,7 +273,7 @@
           </v-card>
         </v-dialog>
 
-        <v-data-table :headers="headers" :items="fileInfos">
+        <v-data-table :headers="headers" :items="fileInfos" height="34vh">
           <v-subheader>Upload Contracts</v-subheader>
           <template v-slot:item.contractName="{ item }">
             {{ getContractName(item.data) }}
@@ -333,6 +313,25 @@
           </template>        
         </v-data-table>
       </v-card>
+
+       <v-card v-if="showProgress" class="mt-4">
+      <div>
+        <div>
+          <v-progress-linear
+          v-model="progress"
+          color="light-blue"
+          height="25"
+          reactive
+          >
+          <strong>{{ progress }} %</strong>
+          </v-progress-linear>
+        </div>
+      </div>
+      </v-card>
+
+      <v-alert v-if="message" border="left" color="blue-grey" dark class="mt-4">
+        {{ message }}
+      </v-alert>
     </v-card>
 </template>
 
@@ -383,6 +382,7 @@ export default {
       this.loginSection = false;
       this.signupSection = false;
       this.uploadSection = false;
+      this.uploadDirectorySection = false;
       this.viewDataSection = true;
       this.userSection = true;
       this.contractAddress = undefined;
@@ -430,6 +430,7 @@ export default {
       this.loginSection = true;
       this.signupSection = false;
       this.uploadSection = false;
+      this.uploadDirectorySection = false;
       this.userSection = false;
       this.fileInfos= [];
       this.contractAddress = undefined;
@@ -446,6 +447,7 @@ export default {
       this.loginSection = false;
       this.signupSection = true;
       this.uploadSection = false;
+      this.uploadDirectorySection = false;
       this.userSection = false;
       this.fileInfos= [];
       this.contractAddress = undefined;
@@ -537,6 +539,10 @@ export default {
     logout() {
         this.loginSection = true;
         this.userSection = false;
+        this.signupSection = false;
+        this.userSection = false;
+        this.uploadSection = false;
+        this.uploadDirectorySection = false;
         this.fileInfos = [];
         this.contractAddress = undefined;
         this.ethoProtocolKey = undefined;
@@ -714,6 +720,7 @@ export default {
       });
     },
     uploadDirectory() {
+      this.showProgress = false;
       this.progress = 0;
       if (!this.currentDirectory) {
         this.message = "Please select a directory";
@@ -732,7 +739,7 @@ export default {
         return;
       }
 
-      this.showProgress = true;
+      
       this.message = "";
       
       var self = this;
@@ -741,6 +748,7 @@ export default {
       
       UploadService.uploadDirectory(this.currentDirectory, this.ethoProtocolKey, this.contractName, this.contractDuration, (event) => {
         this.progress = Math.round((100 * event.loaded) / event.total);
+        console.log(this.progress);
         if(this.progress == 100) {
           this.showProgress = false;
           this.progress = 0;

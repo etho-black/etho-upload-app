@@ -27,8 +27,8 @@ class UploadFilesService {
         formData.append("key", key);
         formData.append("name", name);
         formData.append("duration", duration);
-        console.log("finished");
-        console.log(formData);
+        //console.log("finished");
+        //console.log(formData);
         return http.post("/uploaddirectory", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
