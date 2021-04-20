@@ -739,7 +739,7 @@ export default {
         return;
       }
 
-      
+      this.showProgress = true;
       this.message = "";
       
       var self = this;
