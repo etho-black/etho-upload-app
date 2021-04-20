@@ -748,7 +748,6 @@ export default {
       
       UploadService.uploadDirectory(this.currentDirectory, this.ethoProtocolKey, this.contractName, this.contractDuration, (event) => {
         this.progress = Math.round((100 * event.loaded) / event.total);
-        console.log(this.progress);
         if(this.progress == 100) {
           this.showProgress = false;
           this.progress = 0;
