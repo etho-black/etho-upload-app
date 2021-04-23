@@ -579,6 +579,7 @@ export default {
           this.message = "User already registered, please login";
           return
         } else {
+          this.message = "User registration in process";
           this.showProgress = true;
           progressInterval = setInterval(function(){
             if(loaded < 99) {
@@ -595,29 +596,28 @@ export default {
             console.log(response);
             if(response.data.message === "false") {
               this.message = "User registration failed, please check wallet balance";
+              this.showProgress = false;
+              clearInterval(progressInterval);
               return
             } else {
-              this.message = "Retrieving existing contracts";
-              UploadService.list(this.ethoProtocolKey).then(response => {
-
-                loaded = 100;
-                clearInterval(progressInterval);
-                this.updateProgressBar(loaded);
-                this.fileInfos = response.data;
-                this.message = "User registration successful";
-                this.loginSection = false;
-                this.userSection = true;
-                setTimeout(function(){ 
-                  self.message = "";
-                }, 3000);
-                
-              })
-            }
+              loaded = 100;
+              this.updateProgressBar(loaded);
+              this.showProgress = true;
+              clearInterval(progressInterval);
+              this.showProgress = false;
+              this.message = "User registration successful";
+              setTimeout(function(){ 
+                self.message = "";
+              }, 3000);
+              this.login();
+            }   
           })
         }  
       })
     },
     login() {
+      this.signupSection = false;
+      this.showProgress = false;
       this.progress = 0;
       if (!this.ethoProtocolKey) {
         this.message = "Please enter Etho Protocol key";
