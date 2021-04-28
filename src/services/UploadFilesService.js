@@ -1,6 +1,19 @@
 import http from "../http-common";
 
 class UploadFilesService {
+  calculateCost(size, duration) {
+    let formData = new FormData();
+
+    formData.append("size", size);
+    formData.append("duration", duration);
+
+    return http.post("/calculatecost", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+  }
+
   upload(file, key, name, duration, onUploadProgress) {
     let formData = new FormData();
     console.log(file);

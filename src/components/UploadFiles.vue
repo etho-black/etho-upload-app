@@ -5,7 +5,7 @@
       class="px-4 py-10"
     >
       <v-tabs
-        background-color="pink"
+        background-color="#840032"
         center-active
         dark
         class="pb-3"
@@ -144,6 +144,14 @@
           </v-col>
         </v-row>
 
+
+        <v-card v-if="fileUploadCost>0" color="#840032" class="pb-1 pt-2 my-2 mx-6">
+          <p class="white--text text-center">
+            Upload Cost:  {{ fileUploadCost }}  ETHO
+          </p>
+        </v-card>
+
+
         <v-row justify="center" align="center">
           <v-col cols="4" class="pl-2" justify="center" align="center">
             <v-btn color="success" dark small @click="upload">
@@ -184,11 +192,19 @@
               show-size
               multiple
               webkitdirectory
+              COUNTER
+              prepend-icon="mdi-folder"
               label="Directory input"
               @change="selectDirectory"
             ></v-file-input>
           </v-col>
         </v-row>
+
+        <v-card v-if="directoryUploadCost>0" color="#840032" class="pb-1 pt-2 my-2 mx-6">
+          <p class="white--text text-center">
+            Upload Cost:  {{ directoryUploadCost }}  ETHO
+          </p>
+        </v-card>
 
         <v-row justify="center" align="center">
           <v-col cols="4" class="pl-2" justify="center" align="center">
@@ -318,7 +334,7 @@
       <div>
         <div>
           <v-progress-linear
-          v-model="progress"
+          :value="progress"
           color="light-blue"
           height="25"
           reactive
@@ -342,6 +358,8 @@ export default {
   name: "upload-files",
   data() {
     return {
+      fileUploadCost: 0,
+      directoryUploadCost: 0,
       extensionConfirm: false,
       removalConfirm: false,
       uploadSection: false,
@@ -378,6 +396,22 @@ export default {
     };
   },
   methods: {
+    async calculateFileUploadCost(size) {
+      UploadService.calculateCost(size, this.contractDuration).then(response => {
+        console.log(response);
+        this.fileUploadCost = (Number(response.data.uploadCost) / 1000000000000000000).toFixed(8);
+        return true;
+      });
+        
+    },
+    async calculateDirectoryUploadCost(size) {
+      UploadService.calculateCost(size, this.contractDuration).then(response => {
+        console.log(response);
+        this.directoryUploadCost = (Number(response.data.uploadCost) / 1000000000000000000).toFixed(8);
+        return true;
+      });
+        
+    },
     showViewDataSection() {
       this.loginSection = false;
       this.signupSection = false;
@@ -497,11 +531,24 @@ export default {
     selectFile(file) {
       this.progress = 0;
       this.currentFile = file;
+
+      this.fileSize = file.size;
+      this.calculateFileUploadCost(file.size);
     },
     selectDirectory(directory) {
       console.log(directory);
       this.progress = 0;
       this.currentDirectory = directory;
+
+      var size = 0;
+      for (var i = 0; i <= directory.length - 1; i++) {
+        size += directory[i].size;
+        if(i == (directory.length - 1)) {
+          this.directorySize = size;
+          this.calculateDirectoryUploadCost(size);
+        }
+      }
+
     },
     setContractName(name) {
       this.progress = 0;
@@ -510,6 +557,11 @@ export default {
     setContractDuration(duration) {
       this.progress = 0;
       this.contractDuration = duration;
+      if(this.currentFile != undefined) {
+        this.calculateFileUploadCost(this.fileSize);
+      } else if(this.currentDirectory != undefined) {
+        this.calculateDirectoryUploadCost(this.directorySize);
+      }
     },
     getContractName(data) {
       console.log(data);
