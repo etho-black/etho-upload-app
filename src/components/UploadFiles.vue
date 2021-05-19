@@ -295,10 +295,10 @@
             {{ getContractName(item.data) }}
           </template>
           <template v-slot:item.dataLink="{ item }">
-            <v-btn :href="'//ipfs.io/ipfs/' + item.ipfsHash" x-small>View</v-btn>
+            <v-btn :href="'//data.ethoprotocol.com/ipfs/' + item.ipfsHash" x-small target="_blank">View</v-btn>
           </template>
           <template v-slot:item.addressLink="{ item }">
-            <v-btn :href="'//blocks.ether1.org/addr/' + item.address" x-small>View</v-btn>
+            <v-btn :href="'//explorer.ethoprotocol.com/address/' + item.address" x-small target="_blank">View</v-btn>
           </template>
           <template v-slot:item.contractActions="{ item }">
             <v-menu
