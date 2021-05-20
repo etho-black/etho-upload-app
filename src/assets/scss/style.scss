@@ -64,6 +64,12 @@
     01.General CSS start
 ==========================*/
 @import 'variable';
+.dropdown-menu a{
+  color: #212529 !important;
+}
+.footer-widget__list a{
+  color: #212529 !important;
+}
 html{
   overflow-x: hidden;
 }

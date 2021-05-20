@@ -5,7 +5,7 @@
     <b-navbar-brand class="navbar-brand" :to="{name:'Main_page'}"><img :src='"../assets/images/etho/logo.png"' height="60" alt="logo"></b-navbar-brand>
     <b-collapse class="default-nav" is-nav id="nav_collapse">
       <b-navbar-nav class="navbar-nav ml-auto" id="mymenu">
-        <b-nav-item href="#home">Home</b-nav-item>
+        <b-nav-item style="cursor: pointer;" @click="openHome">Home</b-nav-item>
         <b-nav-item style="cursor: pointer;" @click="openNodes">Nodes</b-nav-item>
         <b-nav-item style="cursor: pointer;" @click="openStaking">Staking</b-nav-item>
 
@@ -29,9 +29,9 @@
         </b-nav-item-dropdown>
 		
 		<b-nav-item-dropdown right-alignment text="Links" class="nav-link">
-          <b-dropdown-item class="nav-link" :href='"whitepaper.pdf"' target="_blank">Whitepaper</b-dropdown-item>
-          <b-dropdown-item class="nav-link" :href='"ethoblack2021roadmap.jpg"' target="_blank">Roadmap</b-dropdown-item>
-          <b-dropdown-item class="nav-link" :href='"pitchdeck.pdf"' target="_blank">Pitchdeck</b-dropdown-item>
+          <b-dropdown-item class="nav-link" :href='"https://ethoprotocol.com/whitepaper.pdf"' target="_blank">Whitepaper</b-dropdown-item>
+          <b-dropdown-item class="nav-link" :href='"https://ethoprotocol.com/ethoblack2021roadmap.jpg"' target="_blank">Roadmap</b-dropdown-item>
+          <b-dropdown-item class="nav-link" :href='"https://ethoprotocol.com/pitchdeck.pdf"' target="_blank">Pitchdeck</b-dropdown-item>
         </b-nav-item-dropdown>
 
       </b-navbar-nav>
@@ -43,6 +43,9 @@
 export default {
   name: 'nav-bar',
   methods: {
+    openHome() {
+      window.open('https://ethoprotocol.com');
+    },
     openStaking() {
       window.open('https://staking.ethofs.com');
     },

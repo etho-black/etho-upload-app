@@ -40,6 +40,7 @@
 /*=====================
     01.General CSS start
 ==========================*/
+
 .blog-bradcrumb li, .blog-bradcrumb li a {
   display: inline-block;
   font-size: 13px;
@@ -64,6 +65,7 @@ body {
     padding: 0 !important; }
     body.home-style.three.modal-open .navbar {
       padding: 15px 0 0 !important; }
+    
 
 section {
   padding-top: 100px;

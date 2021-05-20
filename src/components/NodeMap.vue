@@ -45,7 +45,7 @@
         <div class="row margin-bottom">
           <div class="col-lg-4 col-md-6">
             <div class="review-box">
-              <p style="font-size: 18px;">Active Gateway Nodes: </p><h1 style="font-size: 28px;"><span class="f-bold">{{ gn_count }}</span></h1>
+              <p style="font-size: 18px;">Active Service Nodes: </p><h1 style="font-size: 28px;"><span class="f-bold">{{ sn_count }}</span></h1>
             </div>
           </div>
           <div class="col-lg-4 col-md-6">
@@ -55,10 +55,9 @@
           </div>
           <div class="col-lg-4 col-md-6">
             <div class="review-box">
-              <p style="font-size: 18px;">Active Service Nodes: </p><h1 style="font-size: 28px;"><span class="f-bold">{{ sn_count }}</span></h1>
+              <p style="font-size: 18px;">Active Gateway Nodes: </p><h1 style="font-size: 28px;"><span class="f-bold">{{ gn_count }}</span></h1>
             </div>
           </div>
-
         </div>
       </div>
     </div>
