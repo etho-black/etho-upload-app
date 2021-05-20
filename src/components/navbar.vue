@@ -23,9 +23,9 @@
         <b-nav-item href="#team">Team</b-nav-item>
 
         <b-nav-item-dropdown right-alignment text="Where to buy etho" class="nav-link">
-          <b-dropdown-item class="nav-link" :href='"#exchanges"'>Exchanges</b-dropdown-item>
-          <b-dropdown-item class="nav-link" :to="'#swaps'">Swaps</b-dropdown-item>
-          <b-dropdown-item class="nav-link" :to="'#bridges'">Bridges</b-dropdown-item>
+          <b-dropdown-item class="nav-link" :href='"https://ethoprotocol.com/#exchanges"' target="_blank">Exchanges</b-dropdown-item>
+          <b-dropdown-item class="nav-link" :href='"https://ethoprotocol.com/#swaps"'>Swaps</b-dropdown-item>
+          <b-dropdown-item class="nav-link" :href='"https://ethoprotocol.com/#bridges"'>Bridges</b-dropdown-item>
         </b-nav-item-dropdown>
 		
 		<b-nav-item-dropdown right-alignment text="Links" class="nav-link">

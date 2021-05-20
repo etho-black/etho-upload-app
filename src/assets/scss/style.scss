@@ -70,6 +70,13 @@
 .footer-widget__list a{
   color: #212529 !important;
 }
+.fa {
+  color: #777777 !important;
+}
+.fa a:hover{
+  color: #18e7d3 !important;
+  text-decoration: none;
+}
 html{
   overflow-x: hidden;
 }
@@ -181,7 +188,7 @@ p {
 a {
   color: #777777;
   &:hover {
-    color: $color_bright_turquoise;
+    color: $color_bright_turquoise !important;
     text-decoration: none;
   }
   &:focus {
