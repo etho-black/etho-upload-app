@@ -13,7 +13,7 @@
       <a href="https://old.reddit.com/r/etho1/" target="_blank" class="social-link"> <i class="fa fa-reddit" style="padding:10px;"></i> </a>
       <a href="https://ethoprotocol.medium.com" target="_blank" class="social-link"> <i class="fa fa-medium" style="padding:10px;"></i> </a>
       <a href="https://www.youtube.com/channel/UC3nvSLrJq3m32v_oVHLwFng/" target="_blank" class="social-link"> <i class="fa fa-youtube" style="padding:10px;"></i> </a>
-      <a href="https://discordapp.com/invite/MFn9Tmz" target="_blank" class="social-link"> <i class="fa fa-discord" style="padding:10px;"></i> </a>
+      <a href="https://discordapp.com/invite/MFn9Tmz" target="_blank" class="social-link"> <i class="fa fa-commenting" style="padding:10px;"></i> </a>
     </center>
     <p>© 2021 The ETHO Protocol | Ether-1 All Rights Reserved.</p>
   </div>
