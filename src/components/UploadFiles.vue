@@ -19,7 +19,7 @@
         <v-row justify="center" align="center">
           <v-col cols="8">
             <v-text-field
-              label="Etho Protocol Key"
+              label="Etho Protocol Key"	type="password"
               @change="setKey"
             ></v-text-field>
           </v-col>
@@ -52,7 +52,7 @@
         <v-row justify="center" align="center">
           <v-col cols="8">
             <v-text-field
-              label="Etho Protocol Key"
+              label="Etho Protocol Key"	type="password"
               @change="setKey"
             ></v-text-field>
           </v-col>
